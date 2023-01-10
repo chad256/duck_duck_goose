@@ -19,6 +19,9 @@ defmodule DuckDuckGoose.MixProject do
   end
 
   defp deps do
-    []
+    [
+      {:plug, "~> 1.13"},
+      {:plug_cowboy, "~>2.0"}
+    ]
   end
 end

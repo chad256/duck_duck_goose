@@ -3,11 +3,12 @@ defmodule DuckDuckGoose.Application do
 
   use Application
 
+  alias DuckDuckGoose.Router
+
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: DuckDuckGoose.Worker.start_link(arg)
-      # {DuckDuckGoose.Worker, arg}
+      {Plug.Cowboy, scheme: :http, plug: Router, options: [port: Router.port()]}
     ]
 
     opts = [strategy: :one_for_one, name: DuckDuckGoose.Supervisor]
