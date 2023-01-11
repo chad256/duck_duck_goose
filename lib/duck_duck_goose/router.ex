@@ -1,11 +1,13 @@
 defmodule DuckDuckGoose.Router do
   use Plug.Router
 
+  alias DuckDuckGoose.Peer
+
   plug(:match)
   plug(:dispatch)
 
   get "/" do
-    send_resp(conn, 200, "Welcome to Duck Duck Goose.")
+    send_resp(conn, 200, Peer.status())
   end
 
   match _ do
