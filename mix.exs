@@ -21,7 +21,10 @@ defmodule DuckDuckGoose.MixProject do
   defp deps do
     [
       {:plug, "~> 1.13"},
-      {:plug_cowboy, "~>2.0"}
+      {:plug_cowboy, "~>2.0"},
+      {:redix, "~> 1.1"},
+      {:castore, ">= 0.0.0"},
+      {:jason, "~> 1.3"}
     ]
   end
 end

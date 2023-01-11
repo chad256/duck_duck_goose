@@ -3,12 +3,13 @@ defmodule DuckDuckGoose.Application do
 
   use Application
 
-  alias DuckDuckGoose.Router
+  alias DuckDuckGoose.{Router, RedisClient}
 
   @impl true
   def start(_type, _args) do
     children = [
-      {Plug.Cowboy, scheme: :http, plug: Router, options: [port: Router.port()]}
+      {Plug.Cowboy, scheme: :http, plug: Router, options: [port: Router.port()]},
+      {RedisClient, []}
     ]
 
     opts = [strategy: :one_for_one, name: DuckDuckGoose.Supervisor]
