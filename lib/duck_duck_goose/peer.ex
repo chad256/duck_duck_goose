@@ -20,15 +20,16 @@ defmodule DuckDuckGoose.Peer do
   def init(_arg) do
     Logger.info("Starting peer.")
 
-    {:ok,
-     %{
-       status: "duck",
-       term: 0,
-       election_timer: set_election_timer(),
-       candidate: false,
-       votes: 0,
-       followers: []
-     }}
+    state = %{
+      status: "duck",
+      term: 0,
+      election_timer: set_election_timer(),
+      candidate: false,
+      votes: 0,
+      followers: []
+    }
+
+    {:ok, state}
   end
 
   def handle_call(:status, _, %{status: status} = state) do
@@ -40,29 +41,30 @@ defmodule DuckDuckGoose.Peer do
 
     if RedisClient.node_list() |> length() == 1 do
       Process.cancel_timer(timer_ref)
-      RPC.broadcast_leadership(new_term)
 
-      {:noreply,
-       %{
-         status: "goose",
-         term: new_term,
-         election_timer: set_election_timer(),
-         candidate: false,
-         votes: 0,
-         followers: [self()]
-       }}
+      state = %{
+        status: "goose",
+        term: new_term,
+        election_timer: set_election_timer(),
+        candidate: false,
+        votes: 0,
+        followers: [self()]
+      }
+
+      {:noreply, state}
     else
       RPC.broadcast_election(new_term)
 
-      {:noreply,
-       %{
-         status: "duck",
-         term: new_term,
-         election_timer: set_election_timer(),
-         candidate: true,
-         votes: 1,
-         followers: []
-       }}
+      state = %{
+        status: "duck",
+        term: new_term,
+        election_timer: set_election_timer(),
+        candidate: true,
+        votes: 1,
+        followers: []
+      }
+
+      {:noreply, state}
     end
   end
 
@@ -74,15 +76,16 @@ defmodule DuckDuckGoose.Peer do
       Process.cancel_timer(timer_ref)
       RPC.send_vote(pid)
 
-      {:noreply,
-       %{
-         status: "duck",
-         term: candidate_term,
-         election_timer: set_election_timer(),
-         candidate: false,
-         votes: 0,
-         followers: []
-       }}
+      state = %{
+        status: "duck",
+        term: candidate_term,
+        election_timer: set_election_timer(),
+        candidate: false,
+        votes: 0,
+        followers: []
+      }
+
+      {:noreply, state}
     else
       {:noreply, peer_state}
     end
@@ -96,15 +99,16 @@ defmodule DuckDuckGoose.Peer do
       Process.cancel_timer(timer_ref)
       RPC.broadcast_leadership(term)
 
-      {:noreply,
-       %{
-         status: "goose",
-         term: term,
-         election_timer: set_election_timer(),
-         candidate: false,
-         votes: 0,
-         followers: [self()]
-       }}
+      state = %{
+        status: "goose",
+        term: term,
+        election_timer: set_election_timer(),
+        candidate: false,
+        votes: 0,
+        followers: [self()]
+      }
+
+      {:noreply, state}
     else
       {:noreply, %{peer_state | votes: votes + 1}}
     end
@@ -124,15 +128,16 @@ defmodule DuckDuckGoose.Peer do
       Process.cancel_timer(timer_ref)
       RPC.ack_leader_heartbeat(pid)
 
-      {:noreply,
-       %{
-         status: "duck",
-         term: leader_term,
-         election_timer: set_election_timer(),
-         candidate: false,
-         votes: 0,
-         followers: []
-       }}
+      state = %{
+        status: "duck",
+        term: leader_term,
+        election_timer: set_election_timer(),
+        candidate: false,
+        votes: 0,
+        followers: []
+      }
+
+      {:noreply, state}
     else
       {:noreply, peer_state}
     end
